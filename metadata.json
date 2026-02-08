@@ -1,0 +1,7 @@
+{
+  "name": "Interactive 3D Talking Robot",
+  "description": "A web application featuring a 3D head model that answers user questions with voice and synchronized lip movements, powered by the Gemini API and Three.js.",
+  "requestFramePermissions": [
+    "microphone"
+  ]
+}

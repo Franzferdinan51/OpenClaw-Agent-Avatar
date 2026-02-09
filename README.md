@@ -1,20 +1,88 @@
-<div align="center">
-<img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
-</div>
 
-# Run and deploy your AI Studio app
+# OpenClaw Interface v2.2
 
-This contains everything you need to run your app locally.
+A 3D, interactive, voice-enabled avatar interface designed for Humans and AI Agents. This interface supports connecting to Google Gemini, OpenRouter, and **OpenClaw Agents**.
 
-View your app in AI Studio: https://ai.studio/apps/drive/13vTuzP5cJBTan27y7RtBApGAv5f86N36
+## 🤖 For AI Agents (Auto-Configuration)
 
-## Run Locally
+Agents can "configure themselves" by generating a Deep Link to this application. If you are an Agent orchestrating a swarm or simply want to direct a human to a specific interface context, use the following URL parameters.
 
-**Prerequisites:**  Node.js
+### URL Parameters
 
+*   `provider`: `gemini` | `openrouter` | `openclaw` (Required for auto-config)
+*   `baseUrl`: The full URL endpoint of the Agent (Required for `openclaw`)
+*   `agentId`: A specific ID to route the chat to (Optional)
+*   `authToken`: Bearer token or API Key for the agent (Optional)
+*   `model`: Overrides the model ID (for `gemini` or `openrouter`)
 
-1. Install dependencies:
-   `npm install`
-2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
-3. Run the app:
-   `npm run dev`
+### Examples
+
+**1. Direct Connection to a Local OpenClaw Agent**
+```
+http://your-interface-url.com/?provider=openclaw&baseUrl=http://localhost:8000/api/chat&agentId=swarm-leader-1
+```
+
+**2. Direct Connection to OpenRouter with a specific Model**
+```
+http://your-interface-url.com/?provider=openrouter&model=anthropic/claude-3-opus
+```
+
+---
+
+## 🛠 OpenClaw / Agent Integration
+
+The interface expects the following endpoints from your agent server for full functionality:
+
+### 1. Chat Interaction (`POST /chat`)
+**Request:**
+```json
+{
+  "message": "User input text",
+  "agentId": "configured-agent-id",
+  "sessionId": "random-session-id",
+  "history": [ { "role": "user", "content": "..." } ],
+  "files": [ { "name": "image.png", "type": "image/png", "data": "base64..." } ]
+}
+```
+
+**Response:**
+Your agent should return a JSON object. The interface looks for content in this order: `response` > `message` > `text` > `output`.
+
+**Chain of Thought / Reasoning:**
+To display a "Neural Process" (collapsible thought block), return a `thoughts` array or `steps` array in your JSON response.
+```json
+{
+  "response": "Here is the calculation.",
+  "thoughts": [ "Checking database...", "Found 3 records.", "Calculating average..." ]
+}
+```
+
+### 2. Agent Discovery (`GET /agents`)
+Used by the "Discover Agents" button in settings.
+**Response:**
+```json
+{
+  "agents": [
+    { "id": "agent-1", "name": "Data Analyst", "description": "Analyzing spreadsheets" }
+  ]
+}
+```
+
+### 3. Health Check (`GET /health`)
+Used by the connection status indicator. Returns `200 OK`.
+
+---
+
+## 👤 For Humans
+
+### Features
+*   **3D Avatar**: Real-time lipsync and expressions.
+*   **Multimodal**: Click the paperclip to upload images to Gemini or your Agent.
+*   **Voice I/O**: Speak to the agent using the microphone.
+*   **Cyberpunk HUD**: Immersive, glassmorphism-based UI.
+
+### Manual Configuration
+
+1.  Click the **Gear Icon** in the top right.
+2.  Select **AI Provider** tab.
+3.  Choose **OpenClaw** to connect to custom agents.
